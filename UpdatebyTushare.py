@@ -10,7 +10,7 @@ def updatestockinfo(filelocation):
             ds = pd.read_csv(filelocation+df.ix[i].name+'.csv')
             if ds.ix[len(ds)-1].date != dt.datetime.now().strftime('%Y-%m-%d'): # 数据不是最新
                 tmp = ts.get_k_data(df.ix[i].name,start=ds.ix[len(ds)-1].date, end=dt.datetime.now().strftime('%Y-%m-%d'))
-                ds = pd.concat([tmp, ds], axis = 0)
+                ds = pd.concat([ds, tmp], axis = 0)
                 ds.to_csv(filelocation+df.ix[i].name+'.csv',columns=['date','open','high','low','close','volume'], index=False)
         except FileNotFoundError:
             ds = getnewstockinfo(i,df)
