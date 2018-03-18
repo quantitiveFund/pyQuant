@@ -22,6 +22,7 @@ def findjumphigh(df, code):
         ratio_suc = round(count_sus / count_ch, 4)
         ret = round(ret, 4)
         hist_ret = round((df.ix[len(df)-1].close - df.ix[0].close) / df.ix[0].close, 4)
+        
         print('\n 在股票'+code+'中，有跳空高开的机会 '+str(count_ch)+'次。占总交易日比例的 '+str(ratio_exc * 100)+'%。\n')
         print('所有机会中可盈利的比例为 '+str(ratio_suc * 100)+'%。在该股票样本空间中一直持有总收益为 '+str(hist_ret * 100)+'%，策略收益为 '+str(ret * 100)+'%.\n') 
         return (ratio_exc, ratio_suc, hist_ret, ret)
