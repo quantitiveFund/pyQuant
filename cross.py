@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Spyder Editor
+Spyder Editor author: YZL
 
 This is a temporary script file.
 """
