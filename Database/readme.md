@@ -38,8 +38,11 @@ MariaDB可以在多种平台上使用，Windows平台的下载版本 MariaDB 10.
 `conn = mysql.connector.connect(user='root', password='11031103', database='stockdata')` 该数据库是在Navicat中手动建立
 
 `cursor = conn.cursor()` 数据库连接命令
+
 `cursor.execute('create table stockname (id varchar(20) primary key, name varchar(20), code varchar(20))')`  建表可以在Navicat中完成
+
 `cursor.execute('insert into stockname (id, name, code) values (%s, %s, %s)', ['1', '中国石油', '600001'])`
+
 `conn.commit()` 完成数据库建表以及插入工作
 
 `cursor.close()` 关闭数据库
