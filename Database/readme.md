@@ -9,6 +9,8 @@ MariaDB可以在多种平台上使用，Windows平台的下载版本 MariaDB 10.
 
 安装MariaDB时候需要设置，MariaDB会提示输入root用户的口令，**请务必记清楚** （否则貌似需要重新安装才可以调整口令，另外my.ini文件在所有程序 -> MariaDB 里面）。在Windows上，安装时请选择UTF-8编码，以便正确地处理中文。在安装过程中，其他端口的选择都选择默认3306，主机名称 localhost。
 
+服务器 Windows Server 2003 适合版本 5.5.33a 32位 [下载地址](https://downloads.mariadb.org/interstitial/mariadb-5.5.33a/win32-packages/mariadb-5.5.33a-win32.msi/from/http%3A//ftp.hosteurope.de/mirror/archive.mariadb.org/?serve)
+
 ## MariaDB 驱动 ##
 
 需要支持Python的MySQL驱动来连接到MySQL服务器。MySQL官方提供了mysql-connector-python驱动，但是安装的时候需要给pip命令加上参数--allow-external：
