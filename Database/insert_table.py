@@ -7,7 +7,7 @@ Created on Thu Apr  5 21:06:27 2018
 import mysql.connector
 import pandas as pd
 
-conn = mysql.connector.connect(user='root', password='11031103', database='stockdata')
+conn = mysql.connector.connect(host='10.23.0.2', port=3306, user='root', password='*****', database='quant')
 cursor = conn.cursor()
 
 
