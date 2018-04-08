@@ -18,8 +18,16 @@ conn.commit()
 f = pd.read_csv('datastockbasics.csv', header=0, usecols=[0,1,2,3,15], encoding='gbk')
 sql = 'insert into stockname (code, name, industry, area, IPO) values (%s, %s, %s, %s, %s)'
 
+#for i in range(1,len(f)+1):
+#    cursor.execute(sql,["%06d"%(f[i-1:i]['code'][i-1]),f[i-1:i]['name'][i-1],f[i-1:i]['industry'][i-1],f[i-1:i]['area'][i-1],str(f[i-1:i]['timeToMarket'][i-1])])
+#    conn.commit()
+
 for i in range(1,len(f)+1):
-    cursor.execute(sql,["%06d"%(f[i-1:i]['code'][i-1]),f[i-1:i]['name'][i-1],f[i-1:i]['industry'][i-1],f[i-1:i]['area'][i-1],str(f[i-1:i]['timeToMarket'][i-1])])
+    if f[i-1:i]['timeToMarket'][i-1] == 0:
+        ipo = ''
+    else:
+        ipo = str(f[i-1:i]['timeToMarket'][i-1])
+    cursor.execute(sql, ["%06d"%(f[i-1:i]['code'][i-1]),f[i-1:i]['name'][i-1],f[i-1:i]['industry'][i-1],f[i-1:i]['area'][i-1],ipo])
     conn.commit()
 
 # 新建数据表  以下部分还未测试
