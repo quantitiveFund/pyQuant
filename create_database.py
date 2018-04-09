@@ -77,8 +77,7 @@ def write(code):
         
     conn.commit()
 
-conn = mysql.connector.connect(port=3306, user='root', password='276253', database='stock_database')  
-#conn = mysql.connector.connect(host='10.23.0.2', port=3306, user='root', password='11031103', database='quant')  
+conn = mysql.connector.connect(port=3306, user='root', password='276253', database='stock_database')   
 cursor = conn.cursor()
 conn.commit()
 
