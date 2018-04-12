@@ -13,6 +13,7 @@ import time
 #import os
 import csv
 #import pymysql
+import requests
 
 
 #定义读取整个网页的函数
@@ -37,28 +38,31 @@ def get_stockcode(html):
 #定义一个爬虫函数，锁定网易财经网页中股票数据的具体位置
 def crawl_stockdata(code,year,season):
     #将网址中自变量设置为str类型
-    code = str(code)
+    #code = str(code)
     year = str(year)
     season = str(season)
     #网易财经的URL形式
-    dataUrl = dataUrl = 'http://quotes.money.163.com/trade/lsjysj_'+code+'.html?year='+year+'&season='+season
+    dataUrl = 'http://quotes.money.163.com/trade/lsjysj_'+code+'.html?year='+year+'&season='+season
     #获取网易财经的整版网页
-    stockdata = get_html(dataUrl)
+    #stockdata = get_html(dataUrl)
+    stockdata = requests.get(dataUrl)
     #利用BeautiSoup库将HTML文档格式化
     soup = BeautifulSoup(stockdata.text,'lxml')
     #利用BeautiSoup库中的find_all(div,attr)函数定位到股票数据的表格
     table = soup.find_all('table',{'class':'table_bg001'})[0]
     #从大表格中具体定位到<tr></tr>标签下的11个股票数据
     rows = table.find_all('tr')
-    return rows[::-1]
+    #return rows[::-1]
+    return rows
 
 
 '''定义一个写入csv文件的函数，所有股票代码已经通过正则表达式从东方财经爬取，
 而一年只有四个季度，后来又发现随便输入一个年份网页不会报错，仅仅显示没有数据，
 不妨从1991年开始爬取，表格中数据为空则跳过对应年份的网页接着爬'''
 def writeCsv(code):
-    code = str(code)
-    csvFile = open('E:\\symbols\\' + code + '.csv','wb')
+    #code = str(code)
+    #csvFile = open('E:\\symbols\\' + code + '.csv','wb')   wb 是python 2.*的写法，在3.*里面貌似要报错
+    csvFile = open('E:\\symbols\\' + code + '.csv','w')
     writer = csv.writer(csvFile)
     writer.writerow(('日期','开盘价','最高价','最低价','收盘价','涨跌额','涨跌幅','成交量','成交额','振幅','换手率'))
     try:
@@ -92,6 +96,7 @@ if __name__ == '__main__':
     codeList = []#创建一个存储所有股票代码的列表
     
     #遍历所有股票代码中的个股，取出其中的深沪，创业板，中小板股票代码
+    # 这段代码可以考虑更新，应该一句就可以搞定的，至少可以“与”起来
     for single in code:
         if single[0] == '0':
             codeList.append(single)
