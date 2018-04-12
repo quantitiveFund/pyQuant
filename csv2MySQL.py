@@ -42,15 +42,16 @@ for code in csvList:
         try:
             sql3 = "INSERT INTO stock_%s" % code[0:6] + "\
             (日期,开盘价,最高价,最低价,收盘价,涨跌额,涨跌幅,成交量,成交额,振幅,换手率)\
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) " % record
+            VALUES ('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s') " % record
             sql3 = sql3.replace('nan','null').replace('NaN','null')\
             .replace('None','null').replace('none','null')
             cur.execute(sql3)
         except:
             break
 
-cur.close()
+
 conn.commit()
+cur.close()
 conn.close()
         
 
