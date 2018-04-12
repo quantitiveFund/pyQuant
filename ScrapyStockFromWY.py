@@ -106,7 +106,9 @@ if __name__ == '__main__':
             codeList.append(single)
     #遍历集合中每一个股票代码,将对应数据爬取到csv文件中
     for s in codeList:
+        time_start = time.time()
         writeCsv(s)
+        print('Time spent on stock '+s+' is %d sec.' % (time.time()-time_start))
 
 
 
