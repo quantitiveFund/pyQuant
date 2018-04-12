@@ -62,7 +62,7 @@ def crawl_stockdata(code,year,season):
 def writeCsv(code):
     #code = str(code)
     #csvFile = open('E:\\symbols\\' + code + '.csv','wb')   wb 是python 2.*的写法，在3.*里面貌似要报错
-    csvFile = open('E:\\symbols\\' + code + '.csv','w')
+    csvFile = open('E:\\symbols\\' + code + '.csv','w', newline = '')
     writer = csv.writer(csvFile)
     writer.writerow(('日期','开盘价','最高价','最低价','收盘价','涨跌额','涨跌幅','成交量','成交额','振幅','换手率'))
     try:
