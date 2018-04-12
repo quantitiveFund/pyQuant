@@ -52,8 +52,7 @@ def crawl_stockdata(code,year,season):
     table = soup.find_all('table',{'class':'table_bg001'})[0]
     #从大表格中具体定位到<tr></tr>标签下的11个股票数据
     rows = table.find_all('tr')
-    #return rows[::-1]
-    return rows
+    return rows[::-1]
 
 
 '''定义一个写入csv文件的函数，所有股票代码已经通过正则表达式从东方财经爬取，
