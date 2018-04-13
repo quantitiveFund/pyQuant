@@ -21,18 +21,19 @@ csvList = os.listdir(filepath)
 for code in csvList:
     data = pd.read_csv(filepath+code,encoding="gbk")
     #数据库手动建表可以以纯数字作为表名，以代码建表不能以纯数字作为表名，报ProgrammingError
+    #爬虫使用文本属性可以将所有数据原封不动完全爬取到数据库，解决了InterfaceError
     sql2 = "CREATE TABLE stock_%s" % code[0:6] + "(\
-    日期 DATE,\
-    开盘价 DECIMAL(18,2),\
-    最高价 DECIMAL(18,2),\
-    最低价 DECIMAL(18,2),\
-    收盘价 DECIMAL(18,2),\
-    涨跌额 DECIMAL(18,2),\
-    涨跌幅 FLOAT,\
-    成交量 BIGINT,\
-    成交额 BIGINT,\
-    振幅 FLOAT,\
-    换手率 FLOAT\
+    日期 TEXT,\
+    开盘价 TEXT,\
+    最高价 TEXT,\
+    最低价 TEXT,\
+    收盘价 TEXT,\
+    涨跌额 TEXT,\
+    涨跌幅 TEXT,\
+    成交量 TEXT,\
+    成交额 TEXT,\
+    振幅 TEXT,\
+    换手率 TEXT\
     )"
     cur.execute(sql2)
     print("%s" % code[0:6] + "is now storing.")
