@@ -107,8 +107,7 @@ def writeintosql(code, rowinpage):
     print("%s" % code[0:6] + " is now storing.")
     time_start = time.time()
     length = len(data)
-    for s in range(0,len(data)):
-        record = tuple(data.loc[s])
+
         try:
             sql3 = "INSERT INTO stock_%s" % code[0:6] + "\
             (Date,Open,High,Low,Close,ChgRate,ChgAmount,Volume,VolTrans,Ranges,Turnover)\
