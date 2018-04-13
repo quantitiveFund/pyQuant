@@ -19,6 +19,14 @@ conn = mysql.connector.connect(host="localhost",port=3306,user="root",\
 cur = conn.cursor()
 
 
+def table_exist(tab_name):
+    cur.execute('show tables')  # 罗列所有当前库里面的所有表格
+    tables = cur.fetchall()
+    selectab = re.compile(r'\w*stock_\w*')
+    tabnames = selectab.findall(str(tables))
+    res = tab_name in tabnames
+    return res
+  
 #定义读取整个网页的函数
 def get_html(url):
     #获取请求头，以浏览器身份查看网页信息
@@ -108,23 +116,24 @@ def crawl2MySQL(code):
     '''
 #主函数
 if __name__ == '__main__':
-    #东方财富网所有股票代码的URL
     codeUrl = 'http://quote.eastmoney.com/stocklist.html'
     #调用上述函数获取所有股票代码
-    code = get_stockcode(get_html(codeUrl))
+    wholecodelist = get_stockcode(get_html(codeUrl))
     codeList = []#创建一个存储所有股票代码的列表
     
     #遍历所有股票代码中的个股，取出其中的深沪，创业板，中小板股票代码
-    for single in code:
-        if single[0] == '0':
-            codeList.append(single)
-        if single[0] == '3':
-            codeList.append(single)
-        if single[0] == '6':
+    for single in wholecodelist:
+        if single[0] == '0' or single[0] == '3' or single[0] == '6':
             codeList.append(single)
     #遍历集合中每一个股票代码,将对应数据存储到MySQL数据库中
-    for s in codeList:
-        crawl2MySQL(s)
+    for code in codeList[0:4]:
+        tablename = 'stock_'+ code
+        if table_exist(tablename):
+            print('Stock '+code+ ' exist in the database.')
+        else:
+            time_start = time.time()
+            crawl2MySQL(code)
+            print('Time spent on stock '+code+' is %d sec.' % (time.time()-time_start))
         
 
 
