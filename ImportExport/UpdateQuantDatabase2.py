@@ -58,7 +58,7 @@ def update(code):
     except:
         create(code)
 
-conn = mysql.connector.connect(host='localhost', port=3306, user='root', password='11031103', database='quant_backup')  
+conn = mysql.connector.connect(host='localhost', port=3306, user='root', password='*****', database='quant_backup')  
 cursor = conn.cursor()
 
 code_list = w.wset("SectorConstituent","sectorId=a001010100000000;field=wind_code").Data[0]
