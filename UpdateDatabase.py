@@ -25,7 +25,7 @@ def create_table(table_name, columns, data_type):
 def insert_table(table_name, columns, data):
     try:
         for i in range(1, len(data)+1):
-            temp = [str(data.index[i-1].date()), str(data.OPEN[i-1]), str(data.HIGH[i-1]), str(data.LOW[i-1]), str(data.CLOSE[i-1]), str(data.CHG[i-1]), str(round(data.PCT_CHG[i-1], 2)), str(int(round(data.VOLUME[i-1]/100, 0))), str(int(round(data.AMT[i-1]/10000, 0))), str(round(data.SWING[i-1], 2)), str(round(data.TURN[i-1], 2))]
+            temp = [str(data.index[i-1]), str(data.OPEN[i-1]), str(data.HIGH[i-1]), str(data.LOW[i-1]), str(data.CLOSE[i-1]), str(data.CHG[i-1]), str(round(data.PCT_CHG[i-1], 2)), str(int(round(data.VOLUME[i-1]/100, 0))), str(int(round(data.AMT[i-1]/10000, 0))), str(round(data.SWING[i-1], 2)), str(round(data.TURN[i-1], 2))]
             sql = 'insert into ' + table_name + ' ('  + '%s, ' * len(columns) + ')'
             sql = sql[:-3] + sql[-1]
             sql = sql%tuple(columns) + ' values ' + '(' +'%s, ' * len(columns) + ')'
@@ -53,11 +53,11 @@ def update(table_name, columns):
     data = pd.DataFrame(data.Data, index=data.Fields, columns=data.Times).T
     insert_table(table_name, columns, data)
        
-conn = mysql.connector.connect(host='10.23.0.2', port=3306, user='root', password='******', database='quant')  
+conn = mysql.connector.connect(host='localhost', port=3306, user='root', password='*****', database='quant')  
 cursor = conn.cursor()
 
 code_list = w.wset("SectorConstituent","sectorId=a001010100000000;field=wind_code").Data[0]
-#code_list = ['603617.sh', '603618.sh', '603619.sh', '603648.sh', '603659.sh', '000830.sz']
+#code_list = ['600000.sh', '603618.sh', '000830.sz']
 global d
 d = ["open, high, low, close, chg, pct_chg, volume, amt, swing, turn"]
     
