@@ -44,7 +44,6 @@ def abands(dat, lag = 10):
     lo.columns=['p']
     ub = hi.mul(1 + 4 * (hi.sub(lo)).div(hi.add(lo)))
     lb = lo.mul(1 - 4 * (hi.sub(lo)).div(hi.add(lo)))
-
     ub = ub.rolling(window = lag).mean()
     lb = lb.rolling(window = lag).mean() 
     return mb, ub, lb
