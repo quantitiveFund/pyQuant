@@ -10,7 +10,7 @@ Anconda
 
 1. Panadas 
 2. Numpy
-3. <img src="https://matplotlib.org/_static/logo2.svg" style="zoom:10%"/>  [Doc](https://matplotlib.org/api/pyplot_api.html)  [Tutorial](https://matplotlib.org/users/pyplot_tutorial.html)
+3. Matplotlib  [Doc](https://matplotlib.org/api/pyplot_api.html)  [Tutorial](https://matplotlib.org/users/pyplot_tutorial.html)
 
 ## MySQL
 
@@ -22,7 +22,7 @@ Anconda
 
 ## Markdown
 
-1. Typora 
+1. Typora [support](http://support.typora.io)
 
 
 
