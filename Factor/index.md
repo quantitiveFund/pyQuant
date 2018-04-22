@@ -1,12 +1,12 @@
 ## List of Factors
 
-### General Technical Factors ([source](https://www.tradingtechnologies.com/help/x-study/technical-indicator-definitions/list-of-technical-indicators/))
+### General Technical Factors ([source](https://www.tradingtechnologies.com/help/x-study/technical-indicator-definitions/list-of-technical-indicators/))  
 
 1. Acceleration Bands (ABANDS) <[code](/code/abands.py)><[doc](/code/abands.md)>
 2. Accumulation/Distribution (AD)  
 3. Average Directional Movement (ADX)
 4. Absolute Price Oscillator (APO)
-5. Aroon (AR)
+5. Aroon (AR)   
 6. Aroon Oscillator (ARO)
 7. Average True Range (ATR)
 8. Volume on the Ask (AVOL)
