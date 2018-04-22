@@ -14,7 +14,7 @@ Anconda
 
 ## MySQL
 
-1. [MariaDB]( pyQuant/Database/readme.md)
+1. [MariaDB](../Database/readme.md)
        
 
 ## Machine Learning
