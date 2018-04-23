@@ -9,7 +9,7 @@ import pandas as pd
 import mysql.connector as mc
 import numpy as np
 def loadfrommysql(code):
-    con=mc.connect(host='10.23.0.2',port=3306,user='root',password='11031103',database='quant',charset='utf8') #该数据库是手动建立的，请填上相应的密码
+    con=mc.connect(host='****',port=3306,user='root',password='****',database='quant',charset='utf8') #该数据库是手动建立的，请填上相应的密码
     data=pd.read_sql('select * from stock_'+code,con,index_col=['Date'])
     data=pd.DataFrame(data,dtype=float)#数值由str转化为float#
     data.index=pd.to_datetime(data.index)#转化为timestamp画图#
