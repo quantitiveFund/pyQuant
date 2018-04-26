@@ -29,7 +29,7 @@ def insert_table(table_name, columns, data):
         sql = sql%tuple(columns) + ' values ' + '(' +'%s, ' * len(columns) + ')'
         sql = sql[:-3] + sql[-1]
         for i in range(1, len(data)+1):
-            temp = [str(data.index[i-1].date()), str(data.OPEN[i-1]), str(data.HIGH[i-1]), str(data.LOW[i-1]), str(data.CLOSE[i-1]), str(data.CHG[i-1]), str(round(data.PCT_CHG[i-1], 2)), str(int(round(data.VOLUME[i-1]/100, 0))), str(int(round(data.AMT[i-1]/10000, 0))), str(round(data.SWING[i-1], 2)), str(round(data.TURN[i-1], 2))]
+            temp = [str(data.index[i-1]), data.OPEN[i-1], data.HIGH[i-1], data.LOW[i-1], data.CLOSE[i-1], data.CHG[i-1], round(data.PCT_CHG[i-1], 2), int(round(data.VOLUME[i-1]/100, 0)), int(round(data.AMT[i-1]/10000, 0)), round(data.SWING[i-1], 2), round(data.TURN[i-1], 2)]
             cursor.execute(sql, temp)
         conn.commit()
         print('\033[0;32m' + table_name + ' updating compete' + '\033[0m')
@@ -56,13 +56,13 @@ def update(table_name, columns):
 conn = mysql.connector.connect(host='10.23.0.2', port=3306, user='root', password='******', database='quant')  
 cursor = conn.cursor()
 
-#code_list = w.wset("SectorConstituent","sectorId=a001010100000000;field=wind_code").Data[0]
-code_list = ['603617.sh', '603618.sh', '603619.sh', '603648.sh', '603659.sh', '000830.sz']
+code_list = w.wset("SectorConstituent","sectorId=a001010100000000;field=wind_code").Data[0]
+#code_list = ['603617.sh', '603618.sh', '603619.sh', '603648.sh', '603659.sh', '000830.sz']
 global d
 d = ["open, high, low, close, chg, pct_chg, volume, amt, swing, turn"]
     
 columns = ['Date', 'Open', 'High', 'Low', 'Close', 'ChgAmount', 'ChgRate', 'Volume', 'VolTrans', 'Swing', 'Turnover']
-data_type = ['text null', 'text null', 'text null', 'text null', 'text null', 'text null', 'text null', 'text null', 'text null', 'text null', 'text null']
+data_type = ['text null', 'float null', 'float null', 'float null', 'float null', 'float null', 'float null', 'float null', 'float null', 'float null', 'float null']
 
 cursor.execute('show tables')
 tables = cursor.fetchall()
