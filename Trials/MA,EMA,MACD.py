@@ -33,7 +33,7 @@ import mysql.connector
 import pandas as pd 
 import numpy as np
 import matplotlib.pyplot as plt
-conn = mysql.connector.connect(host="10.23.0.2",port=3306,user="root", password="11031103",database="quant",charset="utf8")
+conn = mysql.connector.connect(host="**",port=3306,user="root", password="******",database="quant",charset="utf8")
 cur = conn.cursor()
 #data=a.loc[:,['Date','Close']]     #取两列
 a = pd.read_sql("select * from stock_000002 where Date > '2016' and Date < '2018'", conn) 
