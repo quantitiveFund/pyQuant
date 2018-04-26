@@ -52,9 +52,20 @@ def update(table_name, columns):
         data = w.wsd(code, d, str(dt.datetime.strptime(latest_date, '%Y-%m-%d') + dt.timedelta(days=1)), str(dt.datetime.now()))
     data = pd.DataFrame(data.Data, index=data.Fields, columns=data.Times).T
     insert_table(table_name, columns, data)
-       
-conn = mysql.connector.connect(host='10.23.0.2', port=3306, user='root', password='******', database='quant')  
-cursor = conn.cursor()
+    
+
+while True:
+    hostname = input('Please enter the hostname: ')
+    pw = input('Please enter the password: ')
+    dbname = input('Please enter the number of datebase: ')
+    try:
+        conn = mysql.connector.connect(host=hostname, port=3306, user='root', password=pw, database=dbname)  
+        cursor = conn.cursor()
+    except:
+        re_try = input('The password might be wrong, or the datebase is not available, do you want to retry (y/n)? ')
+        if re_try == 'n' or re_try == 'no':
+            break
+          
 
 code_list = w.wset("SectorConstituent","sectorId=a001010100000000;field=wind_code").Data[0]
 #code_list = ['603617.sh', '603618.sh', '603619.sh', '603648.sh', '603659.sh', '000830.sz']
@@ -63,6 +74,8 @@ d = ["open, high, low, close, chg, pct_chg, volume, amt, swing, turn"]
     
 columns = ['Date', 'Open', 'High', 'Low', 'Close', 'ChgAmount', 'ChgRate', 'Volume', 'VolTrans', 'Swing', 'Turnover']
 data_type = ['text null', 'float null', 'float null', 'float null', 'float null', 'float null', 'float null', 'float null', 'float null', 'float null', 'float null']
+
+
 
 cursor.execute('show tables')
 tables = cursor.fetchall()
