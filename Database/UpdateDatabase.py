@@ -67,6 +67,9 @@ def update(table_name, columns):
         return
     else:
         data = w.wsd(code, d, str(dt.datetime.strptime(latest_date, '%Y-%m-%d') + dt.timedelta(days=1)), str(dt.datetime.now()))
+        if data.Data[0][0] == 'CWSDService: No data.':
+            print('\033[0;32m Please wait for new data available. \033[0m')
+            return
     data = pd.DataFrame(data.Data, index=data.Fields, columns=data.Times).T
     insert_table(table_name, columns, data)
     
