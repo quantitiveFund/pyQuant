@@ -1,1 +1,23 @@
 
+Date Updating Log on 2018-04-27
+Start from: 22:59:36
+The content of table stock_000511 can not be updated !
+The content of table stock_000629 can not be updated !
+The content of table stock_000851 can not be updated !
+The content of table stock_000950 can not be updated !
+Cannot get the latest date on stock_600067
+The content of table stock_600067 can not be updated !
+The content of table stock_600432 can not be updated !
+The content of table stock_600698 can not be updated !
+The content of table stock_600806 can not be updated !
+Update finished at: 23:02:00
+
+Date Updating Log on 2018-04-27
+Start from: 23:44:54
+The content of table stock_000629 can not be updated !
+The content of table stock_000851 can not be updated !
+The content of table stock_000950 can not be updated !
+The content of table stock_600432 can not be updated !
+The content of table stock_600698 can not be updated !
+The content of table stock_600806 can not be updated !
+Update finished at: 23:48:25

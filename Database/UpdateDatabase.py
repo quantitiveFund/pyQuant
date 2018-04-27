@@ -22,7 +22,7 @@ def create_table(table_name, columns, data_type):
         cursor.execute(temp)
         print('\033[0;32m' + table_name + ' has been nearly created.' + '\033[0m')
     except:
-        # 这儿为什么会无法创建表格？除非前头出现语法错误？
+        # 这儿为什么会无法创建表格？除非前头出现语法错误？ 这个问题事实上不会出现的
         print('\033[0;31m' + table_name + ' had already existed' + '\033[0m')
         flog.writelines('The table ' + table_name + ' can not be created !? \n')
 
@@ -32,6 +32,8 @@ def insert_table(table_name, columns, data):
         sql = sql[:-3] + sql[-1]
         sql = sql%tuple(columns) + ' values ' + '(' +'%s, ' * len(columns) + ')'
         sql = sql[:-3] + sql[-1]
+        # 这儿强制将Nan的数据转成0， 即停牌的情况，收盘价沿用停牌前一天，其他数据都为零， Wind的规则是其他数据都是NAN
+        data = data.where(data.notnull(), 0)
         for i in range(1, len(data)+1):
             temp = [str(data.index[i-1]), round(float(data.OPEN[i-1]),2), round(float(data.HIGH[i-1]),2), round(float(data.LOW[i-1]),2), \
                     round(float(data.CLOSE[i-1]),2), round(float(data.CHG[i-1]),2), round(float(data.PCT_CHG[i-1]), 2), \
@@ -41,8 +43,8 @@ def insert_table(table_name, columns, data):
         conn.commit()
         print('\033[0;32m' + table_name + ' content has been updated competely' + '\033[0m')
     except:
-        # 这儿一样需要解释一下原因 ？？
-        print('\033[0;31m' + table_name + ' no need to be updated' + '\033[0m')
+        # WIND 在交易数据来到之前，会出现这个问题
+        print('\033[0;31m Error in updating ' + table_name + '. Please update after a trading day.' + '\033[0m')
         flog.writelines('The content of table ' + table_name + ' can not be updated !\n')
 
 def get_date(table_name):
@@ -61,7 +63,7 @@ def update(table_name, columns):
     if latest_date == None:
         data = w.wsd(code, d, 'ipo')
     elif latest_date == time.strftime('%Y-%m-%d',time.localtime(time.time())):
-        print('\033[0;31m' + table_name + ' is up to date. ' + '\033[0m')
+        print('\033[0;32m' + table_name + ' is up to date. ' + '\033[0m')
         return
     else:
         data = w.wsd(code, d, str(dt.datetime.strptime(latest_date, '%Y-%m-%d') + dt.timedelta(days=1)), str(dt.datetime.now()))
@@ -97,7 +99,8 @@ tables = cursor.fetchall()
 # Open the log file 
 fname = os.getcwd() + '\\log.txt'
 flog = open(fname, 'a+')
-flog.writelines('Date Updating Log on' + str(dt.datetime.now()) + '\n')
+flog.writelines('\n \n Date Updating Log on ' + time.strftime('%Y-%m-%d',time.localtime(time.time())) + '\n')
+flog.writelines('Start from: '+ time.strftime('%H:%M:%S',time.localtime(time.time())) + '\n')
 
 
 for code in code_list:
@@ -108,4 +111,5 @@ for code in code_list:
         create_table(table_name, columns, data_type)
         update(table_name, columns)
 
+flog.writelines('Update finished at: '+ time.strftime('%H:%M:%S',time.localtime(time.time())) + '\n')
 flog.close()
