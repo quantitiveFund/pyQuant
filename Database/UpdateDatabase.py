@@ -9,6 +9,8 @@ import mysql.connector
 import pandas as pd
 import datetime as dt
 from WindPy import w
+import time
+import os
 w.start()
 
 def create_table(table_name, columns, data_type):
@@ -18,9 +20,11 @@ def create_table(table_name, columns, data_type):
            temp += columns[i] + ' ' + data_type[i] + ', '   
         temp = 'create table ' + table_name + '(' + temp[:-2] + ')'
         cursor.execute(temp)
-        print('\033[0;32m' + table_name + ' creating compete' + '\033[0m')
+        print('\033[0;32m' + table_name + ' has been nearly created.' + '\033[0m')
     except:
+        # 这儿为什么会无法创建表格？除非前头出现语法错误？
         print('\033[0;31m' + table_name + ' had already existed' + '\033[0m')
+        flog.writelines('The table ' + table_name + ' can not be created !? \n')
 
 def insert_table(table_name, columns, data):
     try:
@@ -29,12 +33,17 @@ def insert_table(table_name, columns, data):
         sql = sql%tuple(columns) + ' values ' + '(' +'%s, ' * len(columns) + ')'
         sql = sql[:-3] + sql[-1]
         for i in range(1, len(data)+1):
-            temp = [str(data.index[i-1]), data.OPEN[i-1], data.HIGH[i-1], data.LOW[i-1], data.CLOSE[i-1], data.CHG[i-1], round(data.PCT_CHG[i-1], 2), int(round(data.VOLUME[i-1]/100, 0)), int(round(data.AMT[i-1]/10000, 0)), round(data.SWING[i-1], 2), round(data.TURN[i-1], 2)]
+            temp = [str(data.index[i-1]), round(float(data.OPEN[i-1]),2), round(float(data.HIGH[i-1]),2), round(float(data.LOW[i-1]),2), \
+                    round(float(data.CLOSE[i-1]),2), round(float(data.CHG[i-1]),2), round(float(data.PCT_CHG[i-1]), 2), \
+                    int(round(data.VOLUME[i-1]/100, 0)), int(round(data.AMT[i-1]/10000, 0)), \
+                    round(float(data.SWING[i-1]), 2), round(float(data.TURN[i-1]), 2)]
             cursor.execute(sql, temp)
         conn.commit()
-        print('\033[0;32m' + table_name + ' updating compete' + '\033[0m')
+        print('\033[0;32m' + table_name + ' content has been updated competely' + '\033[0m')
     except:
+        # 这儿一样需要解释一下原因 ？？
         print('\033[0;31m' + table_name + ' no need to be updated' + '\033[0m')
+        flog.writelines('The content of table ' + table_name + ' can not be updated !\n')
 
 def get_date(table_name):
     try:
@@ -42,12 +51,18 @@ def get_date(table_name):
         date = cursor.fetchall()[0][0]
         return date
     except:
+        # 这个例外出现是什么原因？除非这个表格是存在的，但是没有任何数据，如果是这样，是不是在这儿应该ruturn None
         print('\033[0;31m' + table_name + ' has no latest date' + '\033[0m')
+        flog.writelines('Cannot get the latest date on ' + table_name + '\n')
+        return None
 
 def update(table_name, columns):
     latest_date = get_date(table_name)
     if latest_date == None:
         data = w.wsd(code, d, 'ipo')
+    elif latest_date == time.strftime('%Y-%m-%d',time.localtime(time.time())):
+        print('\033[0;31m' + table_name + ' is up to date. ' + '\033[0m')
+        return
     else:
         data = w.wsd(code, d, str(dt.datetime.strptime(latest_date, '%Y-%m-%d') + dt.timedelta(days=1)), str(dt.datetime.now()))
     data = pd.DataFrame(data.Data, index=data.Fields, columns=data.Times).T
@@ -61,6 +76,7 @@ while True:
     try:
         conn = mysql.connector.connect(host=hostname, port=3306, user='root', password=pw, database=dbname)  
         cursor = conn.cursor()
+        break
     except:
         re_try = input('The password might be wrong, or the datebase is not available, do you want to retry (y/n)? ')
         if re_try == 'n' or re_try == 'no':
@@ -76,9 +92,13 @@ columns = ['Date', 'Open', 'High', 'Low', 'Close', 'ChgAmount', 'ChgRate', 'Volu
 data_type = ['text null', 'float null', 'float null', 'float null', 'float null', 'float null', 'float null', 'float null', 'float null', 'float null', 'float null']
 
 
-
 cursor.execute('show tables')
 tables = cursor.fetchall()
+# Open the log file 
+fname = os.getcwd() + '\\log.txt'
+flog = open(fname, 'a+')
+flog.writelines('Date Updating Log on' + str(dt.datetime.now()) + '\n')
+
 
 for code in code_list:
     table_name = 'stock_' + code[:6]
@@ -87,3 +107,5 @@ for code in code_list:
     else:
         create_table(table_name, columns, data_type)
         update(table_name, columns)
+
+flog.close()
