@@ -21,3 +21,7 @@ The content of table stock_600432 can not be updated !
 The content of table stock_600698 can not be updated !
 The content of table stock_600806 can not be updated !
 Update finished at: 23:48:25
+
+ 
+ Date Updating Log on 2018-04-28
+Start from: 00:24:56
