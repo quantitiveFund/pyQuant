@@ -55,6 +55,7 @@ if __name__ == '__main__':
         for stock_code in component.Data[1]:
             cursor.execute('update %s set %s = 1 where stock_code = "%s"'%(table_name, 'index_' + index_code[:6], 'stock_' + stock_code[:6]))
             conn.commit()
+            #Q:多久commit一次比较合适？
 
 '''
 import re
