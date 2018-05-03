@@ -4,7 +4,25 @@
 
 ### Install
 
-Anconda 
+![anacoda 10%](https://www.anaconda.com/wp-content/themes/anaconda/images/logo-dark.png)
+
+Anconda (64Bit Windows Python 3.6)
+
+1. Anaconda 附带了一大批常用数据科学包，它附带了 conda、Python 和 150 多个科学包及其依赖项。因此你可以立即开始处理数据。
+
+2. 管理包:  Anaconda 是在 conda（一个包管理器和环境管理器）上发展出来的。在数据分析中，你会用到很多第三方的包，而conda（包管理器）可以很好的帮助你在计算机上安装和管理这些包，包括安装、卸载和更新包。
+
+   `安装好了之后，你可以通过在菜单中找到的Anaconda Prompt，并输入conda list来看看你装了多少包`
+
+3. 管理环境: 为什么需要管理环境呢？
+
+   比如你在A项目中用了 Python 2，而新的项目B老大要求使用Python 3，而同时安装两个Python版本可能会造成许多混乱和错误。这时候 conda就可以帮助你为不同的项目建立不同的运行环境。
+
+   还有很多项目使用的包版本不同，比如不同的pandas版本，不可能同时安装两个 Numpy 版本，你要做的应该是，为每个 Numpy 版本创建一个环境，然后项目的对应环境中工作。这时候conda就可以帮你做到。
+
+   如果你需要更加详细的解释，看下知乎上的这个[链接](https://www.zhihu.com/question/58033789)
+
+Download from ( [FTP](ftp://10.23.0.2/Tools)) ([网盘](https://pan.baidu.com/s/1C_8CWPGuSgg1G_W8DQh-nw)  密码：hjhx)
 
 ### Useful Tools
 
