@@ -26,9 +26,9 @@ Download from ( [FTP](ftp://10.23.0.2/Tools)) ([网盘](https://pan.baidu.com/s/
 
 ### Useful Tools
 
-1. Panadas 
-2. Numpy
-3. Matplotlib  [Doc](https://matplotlib.org/api/pyplot_api.html)  [Tutorial](https://matplotlib.org/users/pyplot_tutorial.html)
+1. Panadas [Web](http://pandas.pydata.org/) [PDF](http://pandas.pydata.org/pandas-docs/stable/pandas.pdf) [教程](https://www.yiibai.com/pandas/python_pandas_series.html)
+2. Numpy [Web](http://www.numpy.org/) [教程](https://www.yiibai.com/numpy/) [Tutorial](https://docs.scipy.org/doc/numpy/user/quickstart.html)
+3. Matplotlib  [Web](https://matplotlib.org/api/pyplot_api.html)  [Tutorial](https://matplotlib.org/users/pyplot_tutorial.html)
 
 ## MySQL
 
@@ -36,6 +36,8 @@ Download from ( [FTP](ftp://10.23.0.2/Tools)) ([网盘](https://pan.baidu.com/s/
        
 
 ## Machine Learning
+
+可以参阅库里面的几本参考书，都是精选了
 
 
 
@@ -76,3 +78,6 @@ Markdown是一种可以使用普通文本编辑器编写的标记语言，通过
 - 简书上的介绍 [here](https://www.jianshu.com/p/3e906d2ce346)
 - 知乎上的介绍 [here](https://www.zhihu.com/topic/19590742/hot)
 - 用 Markdown 写作用什么文本编辑器 [here](https://www.zhihu.com/question/19637157/answer/78063239)
+
+
+
