@@ -36,28 +36,5 @@ def loadfromMysql(code, start_date, end_date=time.strftime('%Y-%m-%d',time.local
         print('Error: unable to fetch data. You might enter a wrong code')
 
 
-#### 函数输入部分
-#code = '600000'
-#start_date = '2017-05-01'
-#end_date = '2018-03-05'
-##paralist = ['Date','Open','High','Low','Close','ChgAmount',\
-##            'ChgRate','Volume','VolTrans','Swing','Turnover']
-#paralist = ['Date','Close']
-#dat = loadfromMysql(code, start_date, end_date, paralist = paralist)
-####
-def abands(dat, lag = 10):
-    mb = dat[['Close']].rolling(window = lag).mean()
-    hi = dat[['High']]
-    hi.columns=['p']
-    lo = dat[['Low']]
-    lo.columns=['p']
-    ub = hi.mul(1 + 4 * (hi.sub(lo)).div(hi.add(lo)))
-    lb = lo.mul(1 - 4 * (hi.sub(lo)).div(hi.add(lo)))
-    ub = ub.rolling(window = lag).mean()
-    lb = lb.rolling(window = lag).mean() 
-    return mb, ub, lb
-    
 
-dat = loadfromMysql(code = '603618', start_date = '2015-01-01', paralist = ['Date','Close','High','Low'])
-mb, ub, lb = abands(dat, 10)
 
