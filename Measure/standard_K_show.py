@@ -23,7 +23,7 @@ def loadfromMysql(code, start_date, end_date=time.strftime('%Y-%m-%d',time.local
     while True:    
         pw = input('Please enter the password: ')
         try:
-            conn = mysql.connector.connect(host='localhost', port=3306, user='root', password = pw, database='quant')  
+            conn = mysql.connector.connect(host='10.23.0.2', port=3306, user='root', password = pw, database='quant')  
             cur = conn.cursor()
             break
         except:
