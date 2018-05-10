@@ -1,8 +1,8 @@
-#Acceleration Bands (ABANDS)
+# Acceleration Bands (ABANDS)
 
 
 
-###描述
+### 描述
 
 Price Headley's Acceleration Bands serve as a trading envelope that  factor in a stock's typical volatility over standard settings of 20 or 80 bars.  They can be used across any time frame, from intra-day to weekly and monthly time frames.  We look for breakout indicators outside these bands, while also using the shorter time frames to define likely support and resistance levels at the lower and upper Acceleration Bands. Acceleration Bands are plotted around a simple moving average as the midpoint, and the upper and lower bands are of equal distance from this midpoint.
 
