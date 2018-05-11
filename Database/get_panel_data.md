@@ -40,7 +40,7 @@ def connect():#连接数据库并返回股票池,conn,cur#
 
 1. **codelist**  股票池
 2. **conn**  数据库地址
-3. **cur**  光标地址，跨文件调用***loadfromMysql()***需传入此参数
+3. **cur**  光标地址，跨文件调用**loadfromMysql()** 需传入此参数
 
 ___
 
@@ -68,11 +68,11 @@ def loadfromMysql(code, cur, start_date='1990-12-19', end_date=time.strftime(
 
 - **参数说明**
 
-1. *code*  **股票代码**‘stock_000001’
+1. *code*  **股票代码**'stock_000001'
 2. *cur*  **光标地址**connect()返回值
 3. *start_date*  **开始日期**，默认'1990-12-19'(暂时无法获取准确IPO日期)
 4. *end_date*   **结束日期**，默认'当天'
-5. *paralist*     **数据列**，默认**['Date','Close']** #一列'Date'，另一列根据按需确定#
+5. *paralist*     **数据列**，默认 **['Date','Close']** #一列'Date'，另一列根据按需确定#
 
 - **使用实例**
 
@@ -106,7 +106,7 @@ ___
 
 **(速度为思路二的3倍，500只股票7.6秒，可能是直接拼数据的原因)**
 
-1. 指定日期，利用**loadfromMysql()**分别获取个股该日期前所有数据
+1. 指定日期，利用**loadfromMysql()** 分别获取个股该日期前所有数据
 2. 所得数据**从后往前取滞后天数**即为目标区间数据
 3. 将所得数据拼接
 
@@ -164,9 +164,9 @@ def get_panel_data(codelist,cur,date,lag,target_columns=['Date','Close']):
 
 1. *codelist*  **目标股票池**
 2. *cur*  **光标地址**，connect()返回值
-3. *date*  **目标日期 **，同时为**end_date**
+3. *date*  **目标日期**，同时为**end_date**
 4. *lag*  **滞后天数**
-5. *target_columns*  **股票目标指标**，默认值['Date','Close']
+5. *target_columns*  **股票目标指标** ，默认值['Date','Close']
 
 data0  获取标准索引(**权威指数**)
 
@@ -199,8 +199,8 @@ ___
 
 **（速度慢，500只股票22秒，可能是得到日期再分别读取区间的原因）**
 
-1. 指定日期，利用**date_lage()**获取滞后区间的起始日期
-2. 代入start_date和end_date，利用**loadfromMysql()**获取目标区间数据
+1. 指定日期，利用**date_lage()** 获取滞后区间的起始日期
+2. 代入start_date和end_date，利用**loadfromMysql()** 获取目标区间数据
 3. 将所得数据拼接
 
 ##### 获取起始日期
@@ -251,7 +251,7 @@ def get_panel_data(codelist,cur,date,lag,target_columns=['Date','Close']):
 - **参数说明**
 
 1. *codelist*  **目标股票池**
-2. *cur*  **光标地址**，*connect()*返回值
+2. *cur*  **光标地址**，connect()返回值
 3. *date*  **目标日期**，同时为**end_date**
 4. *lag*  **滞后天数**
 5. *target_columns*  **股票目标指标**，默认值['Date','Close']
