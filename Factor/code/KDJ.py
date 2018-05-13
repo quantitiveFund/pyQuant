@@ -41,15 +41,15 @@ def loadfromMysql(code, start_date, end_date=time.strftime('%Y-%m-%d',time.local
         print('Error: unable to fetch data. You might enter a wrong code')
 
 def KDJ(dat, nday):
-    dat['K'][nday-1] = dat['D'][nday-1] = 50
+    dat['K'].loc[nday-1] = dat['D'].loc[nday-1] = 50
     periodhigh=dat['Close'].rolling(window = nday).max().astype('float')
     periodlow=dat['Close'].rolling(window = nday).min().astype('float')
     
     for i in range(nday,len(dat)):   #range（start， end， scan) 若只有一个数字则从0开始，第9日开始i8
-        dat['RSV'][i]=100*(dat['Close'][i]-periodlow[i])/(periodhigh[i]-periodlow[i]) #某些股票刚上市会出现一字板涨停，high，low，close一样，rsv为0
-        dat['K'][i]=(2/3)*dat['K'][i-1]+(1/3)*dat['RSV'][i]
-        dat['D'][i]=(2/3)*dat['D'][i-1]+(1/3)*dat['K'][i]
-        dat['J'][i]=3*dat['K'][i]-2*dat['D'][i]
+        dat['RSV'].loc[i]=100*(dat['Close'].loc[i]-periodlow[i])/(periodhigh[i]-periodlow[i]) #某些股票刚上市会出现一字板涨停，high，low，close一样，rsv为0
+        dat['K'].loc[i]=(2/3)*dat['K'].loc[i-1]+(1/3)*dat['RSV'].loc[i]
+        dat['D'].loc[i]=(2/3)*dat['D'].loc[i-1]+(1/3)*dat['K'].loc[i]
+        dat['J'].loc[i]=3*dat['K'].loc[i]-2*dat['D'].loc[i]
     return dat
 ###KDJ交易策略：
 #1、K or D在80以上为超卖区：K or D在20以下为超卖区
