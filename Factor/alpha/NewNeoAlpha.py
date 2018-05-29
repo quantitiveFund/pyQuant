@@ -33,13 +33,19 @@ def get_panel_data(stock_pool, target_data, date, lag=20):
     panel_data.drop(panel_data.columns[0], axis=1, inplace=True)
     return panel_data.dropna(axis=1)
 
+def log(panel_data):
+    return np.log(panel_data)
+
+def sign(panel_data):
+    return np.sign(panel_data)
+
 def delta(panel_data, lag):
     return panel_data.diff(lag)
 
 def delay(panel_data, lag):
     return panel_data.shift(lag)
 
-def standard_rank(panel_data):
+def cs_rank(panel_data):
     return panel_data.rank(axis=1, pct=True)
  
 def correlation(panel_data_1, panel_data_2, day):
@@ -114,29 +120,33 @@ class Alpha(object):
         self.volume = volume
         self.vwap = vwap
 
+    def alpha_001(self):
+        alpha_temp = stddev(self.returns, 20)
+        alpha_temp[self.returns >= 0] = self.close
+        return cs_rank(ts_argmax(signedpower(alpha_temp, 2), 5)) - 0.5
+        
     def alpha_002(self):
-        return -1 * correlation(standard_rank(delta(np.log(self.volume), 2)), standard_rank((self.close / self.open - 1)), 6)
+        return -1 * correlation(cs_rank(delta(log(self.volume), 2)), cs_rank((self.close / self.open - 1)), 6)
     
     def alpha_003(self):
-        return -1 * correlation(standard_rank(self.open), standard_rank(self.volume), 10)
+        return -1 * correlation(cs_rank(self.open), cs_rank(self.volume), 10)
     
     def alpha_004(self):
-        return -1 * ts_rank(standard_rank(self.low), 9)
+        return -1 * ts_rank(cs_rank(self.low), 9)
     
     def alpha_005(self):
-        return standard_rank(self.open - ts_sum(vwap, 10) / 10) * (-1 * abs(standard_rank(self.close - self.vwap)))
+        return cs_rank(self.open - ts_sum(vwap, 10) / 10) * (-1 * abs(cs_rank(self.close - self.vwap)))
     
     def alpha_006(self):
         return -1 * correlation(self.open, self.volume, 10)
     
     def alpha_007(self):
-        alpha_007 = pd.DataFrame(index=self.close.index, columns=self.close.columns)
-        alpha_007[self.volume.rolling(5).mean() < self.volume] = -1 * ts_rank(abs(delta(self.close, 5)), 5) * np.sign((delta(self.close, 5)))
-        alpha_007[self.volume.rolling(5).mean() >= self.volume] = -1
+        alpha_007 = pd.DataFrame(-np.ones_like(self.close), index=self.close.index, columns=self.close.columns)
+        alpha_007[ad(self.volume, 20) < self.volume] = -1 * ts_rank(abs(delta(self.close, 7)), 60) * sign((delta(self.close, 7)))
         return alpha_007
         
     def alpha_008(self):
-        return -1 * standard_rank((ts_sum(self.open, 5) * ts_sum(self.returns, 5)) - delay(ts_sum(self.open, 5) * ts_sum(self.returns, 5), 10))
+        return -1 * cs_rank((ts_sum(self.open, 5) * ts_sum(self.returns, 5)) - delay(ts_sum(self.open, 5) * ts_sum(self.returns, 5), 10))
     
     def alpha_009(self):
         alpha_009 = pd.DataFrame(index=self.close.index, columns=self.close.columns)
@@ -150,56 +160,54 @@ class Alpha(object):
         alpha_010 = pd.DataFrame(index=self.close.index, columns=self.close.columns)
         judgement_1 = 0 < ts_min(delta(self.close, 1), 4)
         judgement_2 = 0 > ts_max(delta(self.close, 1), 4)
-        alpha_010 = standard_rank(-delta(self.close, 1))
-        alpha_010[judgement_1 | judgement_2] = standard_rank(delta(self.close, 1))
+        alpha_010 = cs_rank(-delta(self.close, 1))
+        alpha_010[judgement_1 | judgement_2] = cs_rank(delta(self.close, 1))
           
     def alpha_011(self):
-        return (standard_rank(ts_max(self.vwap - self.close, 3)) + standard_rank(ts_min(self.vwap - self.close, 3))) * standard_rank(delta(self.volume, 3))
+        return (cs_rank(ts_max(self.vwap - self.close, 3)) + cs_rank(ts_min(self.vwap - self.close, 3))) * cs_rank(delta(self.volume, 3))
     
     def alpha_012(self):
-        return np.sign(delta(self.volume, 1)) * (-1 * delta(self.close, 1))
+        return sign(delta(self.volume, 1)) * (-1 * delta(self.close, 1))
     
     def alpha_013(self):
-        return -1 * standard_rank(covariance(standard_rank(self.close), standard_rank(self.volume), 5))
+        return -1 * cs_rank(covariance(cs_rank(self.close), cs_rank(self.volume), 5))
     
     def alpha_014(self):
-        return -1 * standard_rank(delta(self.returns, 3)) * correlation(self.open, self.volume, 10)
+        return -1 * cs_rank(delta(self.returns, 3)) * correlation(self.open, self.volume, 10)
     
     def alpha_015(self):
-        return -1 * ts_sum(standard_rank(correlation(standard_rank(self.high), standard_rank(self.volume), 3)), 3)
+        return -1 * ts_sum(cs_rank(correlation(cs_rank(self.high), cs_rank(self.volume), 3)), 3)
     
     def alpha_016(self):
-        return -1 * standard_rank(correlation(standard_rank(self.high), standard_rank(self.volume), 5))
+        return -1 * cs_rank(covariance(cs_rank(self.high), cs_rank(self.volume), 5))
     
     def alpha_017(self):
-        return -1 * standard_rank(ts_rank(self.close, 10)) * standard_rank(delta(delta(self.close, 1), 1)) * standard_rank(ts_rank(self.volume / self.volume.rolling(20).mean(), 5))
+        return -1 * cs_rank(ts_rank(self.close, 10)) * cs_rank(delta(delta(self.close, 1), 1)) * cs_rank(ts_rank(self.volume / ad(self.volume, 20), 5))
     
     def alpha_018(self):
-        return -1 * standard_rank(stddev(abs(self.close - self.open), 5) + self.close - self.open + correlation(self.close, self.open, 10))
+        return -1 * cs_rank(stddev(abs(self.close - self.open), 5) + self.close - self.open + correlation(self.close, self.open, 10))
     
     def alpha_019(self):
-        return -1 * np.sign(close - delay(self.close, 7) + delta(self.close, 7)) * (1 + standard_rank(1 + ts_sum(self.returns, 5)))
+        return -1 * sign(close - delay(self.close, 7) + delta(self.close, 7)) * (1 + cs_rank(1 + ts_sum(self.returns, 250)))
     
     def alpha_020(self):
-        return -1 * standard_rank(self.open - delay(self.high, 1)) * standard_rank(self.open - delay(self.lose, 1)) * standard_rank(self.open - delay(self.low, 1))
+        return -1 * cs_rank(self.open - delay(self.high, 1)) * cs_rank(self.open - delay(self.lose, 1)) * cs_rank(self.open - delay(self.low, 1))
     
     def alpha_021(self):
-        alpha_021 = pd.DataFrame(index=self.close.index, columns=self.close.columns)
-        judgement_1 = ts_sum(self.close, 8) / 8 + stddev(self.close, 8) < ts_sum(self.close, 2) / 2
-        judgement_2 = ts_sum(self.close, 2) / 2 - stddev(self.close, 8) > ts_sum(self.close, 2) / 2
-        judgement_3 = 1 <= self.volume / self.volume.rolling(20).mean()
-        alpha_021 = alpha_021.fillna(-1)
+        alpha_021 = pd.DataFrame(-np.ones_like(self.close), index=self.close.index, columns=self.close.columns)
+        judgement_1 = (ts_sum(self.close, 8) / 8 + stddev(self.close, 8)) < (ts_sum(self.close, 2) / 2)
+        judgement_2 = (ts_sum(self.close, 2) / 2 - stddev(self.close, 8)) > (ts_sum(self.close, 2) / 2)
+        judgement_3 = 1 <= (self.volume / ad(self.volume, 20))
         alpha_021[judgement_1] = 1
         alpha_021[judgement_2 | judgement_3] = 1
         return alpha_021
     
     def alpha_022(self):
-        return -1 * delta(correlation(self.high, self.volume, 5), 5) * standard_rank(stddev(self.close, 20))
+        return -1 * delta(correlation(self.high, self.volume, 5), 5) * cs_rank(stddev(self.close, 20))
     
     def alpha_023(self):
-        alpha_023 = pd.DataFrame(index=self.high.index, columns=self.high.columns)
+        alpha_023 = pd.DataFrame(np.zeros_like(self.close), index=self.close.index, columns=self.close.columns)
         alpha_023[ts_sum(self.high, 20) / 20 < self.high] = -1 * delta(self.high, 2)
-        alpha_023[ts_sum(self.high, 20) / 20 >= self.high] = 0
         return alpha_023
     
     def alpha_024(self):
@@ -209,96 +217,115 @@ class Alpha(object):
         return alpha_024
     
     def alpha_025(self):
-        return standard_rank(-1 * self.returns * self.volume.rolling(5).mean() * self.vwap * (self.high - self.close))
+        return cs_rank(-1 * self.returns * ad(self.volume, 20) * self.vwap * (self.high - self.close))
     
     def alpha_026(self):
         return -1 * ts_max(correlation(ts_rank(self.volume, 5), ts_rank(self.high, 5), 5), 3)
     
     def alpha_027(self):
-        alpha_027 = pd.DataFrame(index=self.close.index, columns=self.close.columns)
-        alpha_027[0.5 < standard_rank(ts_sum(correlation(standard_rank(self.volume), standard_rank(self.vwap), 6), 2) / 2)] = -1
-        return alpha_027.fillna(1)
+        alpha_027 = pd.DataFrame(np.ones_like(self.close), index=self.close.index, columns=self.close.columns)
+        alpha_027[0.5 < cs_rank(ts_sum(correlation(cs_rank(self.volume), cs_rank(self.vwap), 6), 2) / 2)] = -1
+        return alpha_027
         
     def alpha_028(self):
-        return scale(correlation(self.volume.rolling(20).mean(), self.low, 5) + (self.high + self.low) / 2 - self.close)
-    
+        return scale(correlation(ad(self.volume, 20), self.low, 5) + (self.high + self.low) / 2 - self.close)
+    #???
     def alpha_029(self):
-        return ts_min(product(standard_rank(standard_rank(scale(np.log(ts_sum(ts_min(standard_rank(standard_rank(-1 * standard_rank(delta(close - 1, 5)))), 2), 1))))), 1), 5) + ts_rank(delay(-1 * returns, 6), 5)
+        return ts_min(product(cs_rank(cs_rank(scale(np.log(ts_sum(ts_min(cs_rank(cs_rank(-1 * cs_rank(delta(close - 1, 5)))), 2), 1))))), 1), 5) + ts_rank(delay(-1 * returns, 6), 5)
     
     def alpha_030(self):
-        return (1 - standard_rank(np.sign(self.close - delay(self.close, 1)) + np.sign(delay(self.close, 1) - delay(self.close, 2)) + np.sign(delay(self.close, 2) - delay(self.close, 3)))) * ts_sum(self.volume, 5) / ts_sum(self.volume, 20)
+        return (1 - cs_rank(sign(self.close - delay(self.close, 1)) + sign(delay(self.close, 1) - delay(self.close, 2)) + sign(delay(self.close, 2) - delay(self.close, 3)))) * ts_sum(self.volume, 5) / ts_sum(self.volume, 20)
     
     def alpha_031(self):
-        return standard_rank(standard_rank(standard_rank(decay_linear(-1 * standard_rank(standard_rank(delta(self.close, 10))), 10)))) + standard_rank(-1 * delta(self.close, 3)) + np.sign(scale(correlation(self.volume.rolling(20).mean(), self.low, 12)))
+        return cs_rank(cs_rank(cs_rank(decay_linear(-1 * cs_rank(cs_rank(delta(self.close, 10))), 10)))) + cs_rank(-1 * delta(self.close, 3)) + sign(scale(correlation(ad(self.volume, 20), self.low, 12)))
     
     def alpha_032(self):
         return scale(ts_sum(self.close, 7) / 7 - self.close) + 20 * scale(correlation(self.vwap, delay(self.close, 5), 230))
     
     def alpha_033(self):
-        return standard_rank(-1 * (1 - self.open / self.close))
+        return cs_rank(-1 * (1 - self.open / self.close))
     
     def alpha_034(self):
-        return standard_rank(1 - standard_rank(stddev(self.returns, 2) / stddev(self.returns, 5)) + 1 - standard_rank(delta(self.close, 1)))
+        return cs_rank(1 - cs_rank(stddev(self.returns, 2) / stddev(self.returns, 5)) + 1 - cs_rank(delta(self.close, 1)))
     
     def alpha_035(self):
         return ts_rank(self.volume, 32) * (1 - ts_rank(self.close + self.high - self.low), 16) * (1 - ts_rank(self.returns, 32))
     
     def alpha_036(self):
-        return 2.21 * standard_rank(correlation(self.close - self.open, delay(self.volume, 1), 15)) + 0.7 * standard_rank(self.open - self.close) + 0.73 * standard_rank(ts_rank(delay(-1 * self.returns, 6), 5)) + standard_rank(abs(correlation(self.vwap, self.volume.rolling(20).mean(), 6))) + 0.6 * standard_rank((ts_sum(self.close, 200) / 200 - self.open) * (self.close - self.open)) 
+        return 2.21 * cs_rank(correlation(self.close - self.open, delay(self.volume, 1), 15)) + 0.7 * cs_rank(self.open - self.close) + 0.73 * cs_rank(ts_rank(delay(-1 * self.returns, 6), 5)) + cs_rank(abs(correlation(self.vwap, ad(self.volume, 20), 6))) + 0.6 * cs_rank((ts_sum(self.close, 200) / 200 - self.open) * (self.close - self.open)) 
     
     def alpha_037(self):
-        return standard_rank(correlation(delay(self.open - self.close, 1), self.close, 5)) + standard_rank(self.open - self.close)
+        return cs_rank(correlation(delay(self.open - self.close, 1), self.close, 200)) + cs_rank(self.open - self.close)
     
     def alpha_038(self):
-        return -1 * standard_rank(ts_rank(self.close, 10)) * standard_rank(self.close / self.open)
+        return -1 * cs_rank(ts_rank(self.close, 10)) * cs_rank(self.close / self.open)
     
     def alpha_039(self):
-        return -1 * standard_rank(delta(self.close, 7) * (1 - standard_rank(decay_linear(self.volume / self.volume.rolling(20).mean(), 9)))) * (1 + standard_rank(ts_sum(self.returns, 250)))
+        return -1 * cs_rank(delta(self.close, 7) * (1 - cs_rank(decay_linear(self.volume / ad(self.volume, 20), 9)))) * (1 + cs_rank(ts_sum(self.returns, 250)))
        
     def alpha_040(self):
-        return -1 * standard_rank(stddev(self.high, 10)) * correlation(self.high, self.volume, 10)    
+        return -1 * cs_rank(stddev(self.high, 10)) * correlation(self.high, self.volume, 10)    
     
     def alpha_041(self):
-        return pow(self.high * self.low, 0.5) * self.vwap
+        return (self.high * self.low) ** 0.5 - self.vwap
     
     def alpha_042(self):
-        return standard_rank(self.vwap - self.close) / standard_rank(self.vwap + self.close)
+        return cs_rank(self.vwap - self.close) / cs_rank(self.vwap + self.close)
     
     def alpha_043(self):
-        return ts_rank(self.volume / self.volume.rolling(20).mean, 20) * ts_rank(-1 * delta(self.close, 7), 8)
+        return ts_rank(self.volume / ad(self.volume, 20), 20) * ts_rank(-1 * delta(self.close, 7), 8)
     
     def alpha_044(self):
-        return -1 * correlation(self.high, standard_rank(self.volume), 5)
+        return -1 * correlation(self.high, cs_rank(self.volume), 5)
     
     def alpha_045(self):
-        return -1 * standard_rank(ts_sum(delay(self.close, 5), 20) / 20) * correlation(self.close, self.volume, 2) * standard_rank(correlation(ts_sum(self.close, 5), ts_sum(self.close, 20), 2))
+        return -1 * cs_rank(ts_sum(delay(self.close, 5), 20) / 20) * correlation(self.close, self.volume, 2) * cs_rank(correlation(ts_sum(self.close, 5), ts_sum(self.close, 20), 2))
+    
+    def alpha_046(self):
+        alpha_046 = -1 * (self.close - delay(self.close, 1))
+        judgement_1 = 0.25 < (delay(self.close, 20) - delay(self.close, 10) / 10) - (delay(self.close, 10) - self.close) / 10
+        judgement_2 = ((delay(self.close, 20) - delay(self.close, 10)) / 10 - (delay(self.close, 10) - self.close) / 10) < 0
+        alpha_046[judgement_1] = -1
+        alpha_046[judgement_2] = 1
+    
+    def alpha_047(self):
+        return (cs_rank(1 / self.close) * self.volume / ad(self.volume, 20)) * (self.high * cs_rank(self.high - self.close) / ts_sum(self.high, 5) / 5 - cs_rank(self.vwap - delay(self.vwap, 5)))
+    
+    def alpha_048(self):
+        pass
+    
+    def alpha_049(self):
+        alpha_049 = self.close - delay(self.close, 1)
+        judgement = (delay(self.close, 20) - delay(self.close, 10) / 10 - (delay(self.close, 10) - self.close) / 10) < -0.1
+        alpha_049[judgement] = 1
+        return alpha_049
     
     def alpha_050(self):
-        return -1 * ts_max(standard_rank(correlation(standard_rank(self.volume), standard_rank(self.vwap), 5)), 5)
+        return -1 * ts_max(cs_rank(correlation(cs_rank(self.volume), cs_rank(self.vwap), 5)), 5)
     
     def alpha_051(self):
         alpha_051 = -1 * (self.close - delay(self.close, 1))
-        judgement = delay(self.close, 20) - delay(self.close, 10) / 10 - (delay(self.close, 10) - self.close) / 10 < -0.05
+        judgement = (delay(self.close, 20) - delay(self.close, 10) / 10 - (delay(self.close, 10) - self.close)) / 10 < -0.05
         alpha_051[judgement] = 1
         return alpha_051
     
     def alpha_052(self):
-        return (-1 * ts_min(self.low, 5) + delay(ts_min(self.low, 5), 5)) * standard_rank(ts_sum(self.returns, 240) - ts_sum(self.returns, 20) / 220) * ts_rank(self.volume, 5)
+        return (-1 * ts_min(self.low, 5) + delay(ts_min(self.low, 5), 5)) * cs_rank(ts_sum(self.returns, 240) - ts_sum(self.returns, 20) / 220) * ts_rank(self.volume, 5)
     
     def alpha_053(self):
         return -1 * delta(((self.close - self.low) - (self.high - self.close)) / (self.close - self.low), 9)
     
     def alpha_054(self):
-        return -1 * ((self.low - self.close) * pow(self.open, 5)) / ((self.low - self.high) * pow(self.close, 5))
+        return -1 * ((self.low - self.close) * self.open ** 5) / ((self.low - self.high) * self.close ** 5)
     
     def alpha_055(self):
-        return -1 * correlation(standard_rank((self.close - ts_min(self.low, 12)) / (ts_max(self.high, 12) - ts_min(self.low, 12))), standard_rank(self.volume), 6)
+        return -1 * correlation(cs_rank((self.close - ts_min(self.low, 12)) / (ts_max(self.high, 12) - ts_min(self.low, 12))), cs_rank(self.volume), 6)
     
     def alpha_056(self):
-        return -1 * standard_rank(ts_sum(self.returns, 10) / ts_sum(ts_sum(self.returns, 2), 3)) * standard_rank(self.returns * self.cap)
+        return -1 * cs_rank(ts_sum(self.returns, 10) / ts_sum(ts_sum(self.returns, 2), 3)) * cs_rank(self.returns * self.cap)
     
     def alpha_057(self):
-        return -1 * (self.close - self.vwap) / decay_linear(standard_rank(ts_argmax(self.close, 30)), 2)
+        return -1 * (self.close - self.vwap) / decay_linear(cs_rank(ts_argmax(self.close, 30)), 2)
     
     def alpha_058(self):
         pass
@@ -307,18 +334,18 @@ class Alpha(object):
         pass
     
     def alpha_060(self):
-        return -1 * 2 * scale(standard_rank((2 * self.close - self.low - self.high) / (self.high - self.low) * self.volume) - scale(standard_rank(ts_argmax(self.close, 10))))
+        return -1 * 2 * scale(cs_rank((2 * self.close - self.low - self.high) / (self.high - self.low) * self.volume) - scale(cs_rank(ts_argmax(self.close, 10))))
     
     def alpha_061(self):
         alpha_061 = pd.DataFrame(-np.ones_like(self.close), index=self.close.index, columns=self.close.columns)
-        judgement = (standard_rank(self.vwap - ts_min(self.vwap, 16))) < (standard_rank(correlation(self.vwap, self.volume.rolling(180).mean(), 17)))
+        judgement = (cs_rank(self.vwap - ts_min(self.vwap, 16))) < (cs_rank(correlation(self.vwap, ad(self.volume, 180), 17)))
         alpha_061[judgement] = 1
         return alpha_061
     
     def alpha_062(self):
         alpha_062 = pd.DataFrame(-np.ones_like(self.close), index=self.close.index, columns=self.close.columns)
-        judgement_1 = (standard_rank(correlation(self.vwap, ts_sum(self.volume.rolling(20).mean(), 22), 9))) < (standard_rank(standard_rank(self.open) * 2))
-        judgement_2 = (standard_rank(standard_rank(self.open) * 2)) < (-1 * (standard_rank((self.high + self.low) / 2 + standard_rank(self.high))))
+        judgement_1 = (cs_rank(correlation(self.vwap, ts_sum(ad(self.volume, 20), 22), 9))) < (cs_rank(cs_rank(self.open) * 2))
+        judgement_2 = (cs_rank(cs_rank(self.open) * 2)) < (-1 * (cs_rank((self.high + self.low) / 2 + cs_rank(self.high))))
         alpha_062[judgement_1 & judgement_2] = 1
         return  alpha_062
     
@@ -327,25 +354,25 @@ class Alpha(object):
     
     def alpha_064(self):
         alpha_064 = pd.DataFrame(-np.ones_like(self.close), index=self.close.index, columns=self.close.columns)
-        judgement = (standard_rank(correlation(ts_sum(self.open * 0.178404 + self.low * (1 - 0.178404), 12), ts_sum(self.volume.rolling(120).mean(), 3), 16))) < (-1 * standard_rank(delta((self.high + self.low) / 2 * 0.178404 + self.vwap * (1 - 0.178404), 3)))
+        judgement = (cs_rank(correlation(ts_sum(self.open * 0.178404 + self.low * (1 - 0.178404), 12), ts_sum(ad(self.volume, 120), 12), 16))) < (-1 * cs_rank(delta((self.high + self.low) / 2 * 0.178404 + self.vwap * (1 - 0.178404), 3)))
         alpha_064[judgement] = 1
         return alpha_064
       
     def alpha_065(self):
         alpha_065 = pd.DataFrame(-np.ones_like(self.close), index=self.close.index, columns=self.close.columns)
-        judgement = standard_rank(correlation(open * 0.00817205 + vwap * (1 - 0.00817205), ts_sum(volume.rolling(60).mean(), 8), 6)) < standard_rank(-1 * (open - ts_min(open, 13)))
+        judgement = cs_rank(correlation(self.open * 0.00817205 + self.vwap * (1 - 0.00817205), ts_sum(ad(self.volume, 60), 8), 6)) < cs_rank(-1 * (self.open - ts_min(self.open, 13)))
         alpha_065[judgement] = 1
         return alpha_065
     
     def alpha_066(self):
-        return -1 * (standard_rank(decay_linear(delta(vwap, 3), 7)) + ts_rank(decay_linear((low - vwap) / (open - (high + low) / 2), 11), 6))
+        return -1 * (cs_rank(decay_linear(delta(self.vwap, 3), 7)) + ts_rank(decay_linear((self.low - self.vwap) / (self.open - (self.high + self.low) / 2), 11), 6))
     
     def alpha_067(self):
         pass
     
     def alpha_068(self):
         alpha_068 = pd.DataFrame(-np.ones_like(self.close), index=self.close.index, columns=self.close.columns)
-        judgement = (ts_rank(correlation(standard_rank(high), standard_rank(volume.rolling(15).mean()), 8), 13)) < (-1 * standard_rank(delta(close * 0.518371 + low * (1 - 0.518371), 1)))
+        judgement = (ts_rank(correlation(cs_rank(self.high), cs_rank(ad(self.volume, 15)), 8), 13)) < cs_rank(-1 * delta(self.close * 0.518371 + self.low * (1 - 0.518371), 1))
         alpha_068[judgement] = 1
         return alpha_068
     
@@ -356,33 +383,27 @@ class Alpha(object):
         pass
     
     def alpha_071(self):
-        alpha_071 = pd.DataFrame(index=close.index, columns=close.columns)
-        alpha_1 = ts_rank(decay_linear(correlation(ts_rank(close, 3), ts_rank(volume.rolling(180).mean(), 12), 18), 4), 15)
-        alpha_2 = ts_rank(decay_linear(pow(standard_rank(low + open - 2 * vwap), 2), 16), 4)
-        alpha_071[alpha_1 > alpha_2] = alpha_1
-        alpha_071[alpha_1 <= alpha_2] = alpha_2
-        return alpha_071
+        alpha_1 = ts_rank(decay_linear(correlation(ts_rank(self.close, 3), ts_rank(ad(self.volume, 180), 12), 18), 4), 15)
+        alpha_2 = ts_rank(decay_linear(cs_rank(self.low + self.open - 2 * self.vwap) ** 2, 16), 4)
+        return compare_max(alpha_1, alpha_2)
     
     def alpha_072(self):
-        return standard_rank(decay_linear(correlation((high + low) / 2, volume.rolling(40).mean(), 8), 10)) / standard_rank(decay_linear(correlation(ts_rank(vwap, 3), ts_rank(volume, 18), 6), 2))
+        return cs_rank(decay_linear(correlation((self.high + self.low) / 2, ad(self.volume, 40), 8), 10)) / cs_rank(decay_linear(correlation(ts_rank(self.vwap, 3), ts_rank(self.volume, 18), 6), 2))
     
     def alpha_073(self):
-        alpha_073 = pd.DataFrame(index=close.index, columns=close.columns)
-        alpha_1 = standard_rank(decay_linear(delta(vwap, 4), 2))
-        alpha_2 = -1 * ts_rank(decay_linear(-1 * delta(open * 0.147155 + low * (1 - 0.147155), 2) / (open * 0.147155 + low * (1 - 0.147155)), 3), 16)
-        alpha_073[alpha_1 > alpha_2] = alpha_1
-        alpha_073[alpha_1 <= alpha_2] = alpha_2
-        return alpha_073
+        alpha_1 = cs_rank(decay_linear(delta(self.vwap, 4), 2))
+        alpha_2 = -1 * ts_rank(decay_linear(-1 * delta(self.open * 0.147155 + self.low * (1 - 0.147155), 2) / (self.open * 0.147155 + self.low * (1 - 0.147155)), 3), 16)
+        return compare_max(alpha_1, alpha_2)
     
     def alpha_074(self):
-        alpha_074 = pd.DataFrame(-np.ones_like(close), index=close.index, columns=close.columns)
-        judgement = (standard_rank(correlation(close, ts_sum(volume.rolling(30).mean(), 37), 15))) < (-1 * standard_rank(correlation(standard_rank(high * 0.0261661 + vwap * (1 - 0.261661)), standard_rank(volume), 11)))
+        alpha_074 = pd.DataFrame(-np.ones_like(self.close), index=self.close.index, columns=self.close.columns)
+        judgement = (cs_rank(correlation(self.close, ts_sum(ad(self.volume, 30), 37), 15))) < (-1 * cs_rank(correlation(cs_rank(self.high * 0.0261661 + self.vwap * (1 - 0.261661)), cs_rank(self.volume), 11)))
         alpha_074[judgement] = 1
         return alpha_074
     
     def alpha_075(self):
-        alpha_075 = pd.DataFrame(-np.ones_like(close), index=close.index, columns=close.columns)
-        judgement = standard_rank(correlation(vwap, volume, 4)) < standard_rank(correlation(standard_rank(low), standard_rank(volume.rolling(50).mean()), 12))
+        alpha_075 = pd.DataFrame(-np.ones_like(self.close), index=self.close.index, columns=self.close.columns)
+        judgement = cs_rank(correlation(self.vwap, self.volume, 4)) < cs_rank(correlation(cs_rank(self.low), cs_rank(ad(self.volume, 50)), 12))
         alpha_075[judgement] = 1
         return alpha_075
     
@@ -390,15 +411,12 @@ class Alpha(object):
         pass
     
     def alpha_077(self):
-        alpha_077 = pd.DataFrame(index=close.index, columns=close.columns)
-        alpha_1 = standard_rank(decay_linear((high + low) / 2 - vwap, 20))
-        alpha_2 = standard_rank(decay_linear(correlation((high + low) / 2, volume.rolling(40).mean(), 3), 5))
-        alpha_077[alpha_1 > alpha_2] = alpha_1
-        alpha_077[alpha_1 <= alpha_2] = alpha_2
-        return alpha_077
+        alpha_1 = cs_rank(decay_linear((self.high + self.low) / 2 - self.vwap, 20))
+        alpha_2 = cs_rank(decay_linear(correlation((self.high + self.low) / 2, ad(self.volume, 40), 3), 5))
+        return compare_min(alpha_1, alpha_2)
     
     def alpha_078(self):
-        return pow(standard_rank(correlation(ts_sum(low * 0.352233 + vwap * (1 - 0.352233), 19), ts_sum(volume.rolling(40).mean(), 19), 6)), standard_rank(correlation(standard_rank(vwap), standard_rank(volume), 5)))
+        return cs_rank(correlation(ts_sum(self.low * 0.352233 + self.vwap * (1 - 0.352233), 19), ts_sum(ad(self.volume, 40), 19), 6)) ** cs_rank(correlation(cs_rank(self.vwap), cs_rank(self.volume), 5))
     
     def alpha_079(self):
         pass
@@ -414,17 +432,17 @@ class Alpha(object):
         pass
     
     def alpha_083(self):
-        return standard_rank(delay((high - low) / ts_sum(close, 5) / 5, 2)) * standard_rank(standard_rank(volume)) / ((high - low) / (ts_sum(close, 5)) / 5 / (vwap - close)) 
+        return cs_rank(delay((self.high - self.low) / ts_sum(self.close, 5) / 5, 2)) * cs_rank(cs_rank(self.volume)) / ((self.high - self.low) / (ts_sum(self.close, 5)) / 5 / (self.vwap - self.close)) 
     
     def alpha_084(self):
-        return ts_rank(vwap - ts_max(vwap, 15), 20) ** (delta(close, 4))
+        return signedpower(ts_rank(self.vwap - ts_max(self.vwap, 15), 20), (delta(self.close, 4)))
     
     def alpha_085(self):
-        return standard_rank(correlation(high * 0.876703 + close * (1 - 0.876703), ad(volume, 30), 9)) ** standard_rank(correlation(ts_rank((high + low) / 2, 3), ts_rank(volume, 10), 7))
+        return cs_rank(correlation(self.high * 0.876703 + self.close * (1 - 0.876703), ad(self.volume, 30), 9)) ** cs_rank(correlation(ts_rank((self.high + self.low) / 2, 3), ts_rank(self.volume, 10), 7))
     
     def alpha_086(self):
-        alpha_086 = pd.DataFrame(-np.ones_like(close), index=close.index, columns=close.columns)
-        judgement = (ts_rank(correlation(close, ts_sum(ad(volume, 20), 14), 6), 20)) < standard_rank(-1 * (close - vwap))
+        alpha_086 = pd.DataFrame(-np.ones_like(self.close), index=self.close.index, columns=self.close.columns)
+        judgement = (ts_rank(correlation(self.close, ts_sum(ad(self.volume, 20), 14), 6), 20)) < cs_rank(-1 * (self.close - self.vwap))
         alpha_086[judgement] = 1
         return alpha_086
         
@@ -432,12 +450,9 @@ class Alpha(object):
         pass
     
     def alpha_088(self):
-        alpha_088 = pd.DataFrame(index=close.index, columns=close.columns)
-        alpha_1 = standard_rank(decay_linear(standard_rank(open) + standard_rank(low) + standard_rank(high) + standard_rank(close), 8))
-        alpha_2 = ts_rank(decay_linear(correlation(ts_rank(close, 8), ts_rank(ad(volume, 60), 20), 8), 6), 2)
-        alpha_088[alpha_1 < alpha_2] = alpha_1
-        alpha_088[alpha_1 >= alpha_2] = alpha_2
-        return alpha_088
+        alpha_1 = cs_rank(decay_linear(cs_rank(self.open) + cs_rank(self.low) + cs_rank(self.high) + cs_rank(self.close), 8))
+        alpha_2 = ts_rank(decay_linear(correlation(ts_rank(self.close, 8), ts_rank(ad(self.volume, 60), 20), 8), 6), 2)
+        return compare_min(alpha_1, alpha_2)
     
     def alpha_089(self):
         pass
@@ -449,47 +464,41 @@ class Alpha(object):
         pass
     
     def alpha_092(self):
-        alpha_temp = pd.DataFrame(-np.ones_like(close), index=close.index, columns=close.columns)
-        judgement_temp = ((high + low) / 2 + close) < (low + open)
+        alpha_temp = pd.DataFrame(-np.ones_like(self.close), index=self.close.index, columns=self.close.columns)
+        judgement_temp = ((self.high + self.low) / 2 + self.close) < (self.low + self.open)
         alpha_temp[judgement_temp] = 1
         alpha_1 = ts_rank(decay_linear(alpha_temp, 14), 18)
-        alpha_2 = ts_rank(decay_linear(correlation(standard_rank(low), standard_rank(ad(volume, 30)), 7), 6), 6)
-        alpha_092 = pd.DataFrame(index=close.index, columns=close.columns)
-        alpha_092[alpha_1 < alpha_2] = alpha_1
-        alpha_092[alpha_1 >= alpha_2] = alpha_2
-        return alpha_092
+        alpha_2 = ts_rank(decay_linear(correlation(cs_rank(self.low), cs_rank(ad(self.volume, 30)), 7), 6), 6)
+        return compare_min(alpha_1, alpha_2)
         
     def alpha_093(self):
         pass
     
     def alpha_094(self):
-        return -1 * standard_rank(vwap - ts_min(vwap, 11)) ** ts_rank(correlation(ts_rank(vwap, 19), ts_rank(ad(volume, 60), 4), 18), 2)
+        return -1 * cs_rank(self.vwap - ts_min(self.vwap, 11)) ** ts_rank(correlation(ts_rank(self.vwap, 19), ts_rank(ad(self.volume, 60), 4), 18), 2)
     
     def alpha_095(self):
-        alpha_095 = pd.DataFrame(-np.ones_like(close), index=close.index, columns=close.columns)
-        alpha_1 = standard_rank(open - ts_min(open, 12))
-        alpha_2 = ts_rank(standard_rank(correlation(ts_sum((high + low) / 2, 19), ts_sum(ad(volume, 40), 19), 12)), 11)
+        alpha_095 = pd.DataFrame(-np.ones_like(self.close), index=self.close.index, columns=self.close.columns)
+        alpha_1 = cs_rank(self.open - ts_min(self.open, 12))
+        alpha_2 = ts_rank(cs_rank(correlation(ts_sum((self.high + self.low) / 2, 19), ts_sum(ad(self.volume, 40), 19), 12)), 11)
         alpha_095[alpha_1 < alpha_2] = 1
         return alpha_095
         
     def alpha_096(self):
-        alpha_096 = pd.DataFrame(index=close.index, columns=close.columns)
-        alpha_1 = ts_rank(decay_linear(correlation(standard_rank(vwap), standard_rank(volume), 3), 4), 8)
-        alpha_2 = ts_rank(decay_linear(ts_argmax(correlation(ts_rank(close, 7), ts_rank(ad(volume, 60), 4), 3), 12), 14), 13)
-        alpha_096[alpha_1 > alpha_2] = -alpha_1
-        alpha_096[alpha_1 <= alpha_2] = -alpha_2
-        return alpha_096
+        alpha_1 = ts_rank(decay_linear(correlation(cs_rank(self.vwap), cs_rank(self.volume), 3), 4), 8)
+        alpha_2 = ts_rank(decay_linear(ts_argmax(correlation(ts_rank(self.close, 7), ts_rank(ad(self.volume, 60), 4), 3), 12), 14), 13)
+        return -1 * compare_max(alpha_1, alpha_2)
         
     def alpha_097(self):
         pass
     
     def alpha_098(self):
-        return standard_rank(decay_linear(correlation(vwap, ts_sum(ad(volume, 5), 26), 4), 7)) - standard_rank(decay_linear(ts_rank(ts_argmin(correlation(standard_rank(open), standard_rank(ad(volume, 15)), 20), 8), 6), 8))
+        return cs_rank(decay_linear(correlation(self.vwap, ts_sum(ad(self.volume, 5), 26), 4), 7)) - cs_rank(decay_linear(ts_rank(ts_argmin(correlation(cs_rank(self.open), cs_rank(ad(self.volume, 15)), 20), 8), 6), 8))
     
     def alpha_099(self):
-        alpha_099 = pd.DataFrame(-np.ones_like(close), index=close.index, columns=close.columns)
-        alpha_1 = standard_rank(correlation(ts_sum((high + low) / 2, 19), ts_sum(ad(volume, 60), 19), 8))
-        alpha_2 = standard_rank(correlation(low, volume, 6))
+        alpha_099 = pd.DataFrame(-np.ones_like(self.close), index=self.close.index, columns=self.close.columns)
+        alpha_1 = cs_rank(correlation(ts_sum((self.high + self.low) / 2, 19), ts_sum(ad(self.volume, 60), 19), 8))
+        alpha_2 = cs_rank(correlation(self.low, self.volume, 6))
         alpha_099[alpha_1 >= alpha_2] = 1
         return alpha_099
     
