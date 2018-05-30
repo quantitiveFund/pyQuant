@@ -11,7 +11,7 @@ from queue import Queue
 import datetime
 import mysql.connector
 
-conn = mysql.connector.connect(host='10.23.0.2', user='root', password='******', database='quant')
+conn = mysql.connector.connect(host='10.23.0.2', user='student', password='1104', database='quant')
 cursor = conn.cursor()
 
 class Event(object):
