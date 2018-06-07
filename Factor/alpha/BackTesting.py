@@ -9,10 +9,8 @@ from abc import ABCMeta, abstractmethod
 import pandas as pd
 from queue import Queue
 import datetime
-import mysql.connector
-
-conn = mysql.connector.connect(host='10.23.0.2', user='student', password='1104', database='quant')
-cursor = conn.cursor()
+from sqlalchemy import create_engine
+conn = create_engine('mysql+mysqldb://root:password@localhost:3306/database?charset=utf8')    
 
 class Event(object):
     pass
@@ -72,8 +70,10 @@ class DataHandler(object):
         raise NotImplemented
 
 class DatabaseHandler(DataHandler):
-    def __init__(self, events, symbol_list):
+    def __init__(self, events, start_date, end_date, symbol_list):
         self.events = events
+        self.start_date = start_date
+        self.end_date = end_date
         self.symbol_list = symbol_list
         
         self.symbol_data = {}
@@ -86,7 +86,7 @@ class DatabaseHandler(DataHandler):
         
     def _load_from_database(self):
         for symbol in self.symbol_list:
-            self.symbol_data[symbol] = pd.read_sql('select * from %s' % symbol, conn, index_col='Date')
+            self.symbol_data[symbol] = pd.read_sql('select * from %s where Date between "%s" and "%s"' % (symbol, self.start_date, self.end_date), conn, index_col='Date')
             
             self.symbol_lastest_data[symbol] = [] 
             
@@ -110,12 +110,13 @@ class DatabaseHandler(DataHandler):
         for symbol in self.symbol_list:
             try:
                 bars = next(self.generator[symbol])
+
             except StopIteration:
                 self.contiune = False
             else:
                 if bars is not None:
                     self.symbol_lastest_data[symbol].append(bars)
-        #???
+
         self.events = MarketEvent()
       
 class Portfolio(object):
@@ -184,7 +185,7 @@ class NaviePortfolio(Portfolio):
         holdings_dict['total'] = self.current_holdings['cash']
         
         for symbol in self.symbol_list:
-            market_value = self.current_holdings[symbol] * bars[symbol][0][5]
+            market_value = self.current_positions[symbol] * bars[symbol][0][5]
             holdings_dict[symbol] = market_value
             holdings_dict['total'] += market_value
             
@@ -217,7 +218,7 @@ class NaviePortfolio(Portfolio):
         if event.type == 'FILL':
             self.update_positions_from_fill(event)
             self.update_holdings_from_fill(event)
-            
+                        
 class Strategy(object):
     
     __metaclass__ = ABCMeta
