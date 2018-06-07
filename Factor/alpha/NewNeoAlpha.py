@@ -7,31 +7,22 @@ Created on Thu May  3 00:20:58 2018
 
 import pandas as pd
 import numpy as np
-import mysql.connector
-
-conn = mysql.connector.connect(host='????', user='root', password='????', database='quant')
-cursor = conn.cursor()
-
-cursor.execute('show tables')
-tables = cursor.fetchall()
-stock_code_list = pd.DataFrame(tables)
-stock_pool = list(stock_code_list.iloc[-50:, 0])
-date = '2017-01-04'
+from sqlalchemy import create_engine
+conn = create_engine('mysql+mysqldb://root:password@localhost:3306/database?charset=utf8')    
 
 def get_trade_date(date, lag):
-    data = pd.read_sql('select * from stock_000001', conn)
+    data = pd.read_sql('select * from index_000001', conn)
     target_date = data[data.index[data.Date.isin([date])][0] - lag:data.index[data.Date.isin([date])][0] + 1]
     return list(target_date.Date)
 
-def get_panel_data(stock_pool, target_data, date, lag=20):
-    panel_data = pd.Series()
-    date_list = get_trade_date(date, lag)
-    for stock_code in stock_pool:
-        time_series_data = pd.read_sql('select %s, %s from %s where Date between "%s" and "%s"'%(target_data, 'Date', stock_code, date_list[0], date), conn, index_col='Date')
-        time_series_data.columns = [stock_code]
+def get_panel_data(stock_pool, target_data, start_date, end_date):
+    time_index = pd.read_sql('select date from index_000001 where date between "%s" and "%s"' % (start_date, end_date), conn)
+    panel_data = pd.DataFrame(index=time_index.date)
+    for stock in stock_pool:
+        time_series_data = pd.read_sql('select Date, %s from %s where Date between "%s" and "%s"' % (target_data, stock, start_date, end_date), conn, index_col='Date')
+        time_series_data.columns = [stock]
         panel_data = pd.concat([panel_data, time_series_data], axis=1)
-    panel_data.drop(panel_data.columns[0], axis=1, inplace=True)
-    return panel_data.dropna(axis=1)
+    return panel_data
 
 def log(panel_data):
     return np.log(panel_data)
@@ -102,19 +93,11 @@ def compare_min(panel_data_1, panel_data_2):
     panel_data_1[panel_data_1 > panel_data_2] = panel_data_2
     return panel_data_1
 
-open = get_panel_data(stock_pool, 'Open', date, lag=250)
-high = get_panel_data(stock_pool, 'High', date, lag=250)
-low = get_panel_data(stock_pool, 'Low', date, lag=250)
-close = get_panel_data(stock_pool, 'Close', date, lag=250)
-returns = get_panel_data(stock_pool, 'ChgRate', date, lag=250)
-volume = get_panel_data(stock_pool, 'Volume', date, lag=250)
-vwap = (open + high + low + close) / 4
-cap = close * volume
-
 class Alpha(object):
     def __init__(self, open, high, low, close, returns, volume, vwap):
         self.open = open
         self.high = high
+        self.low = low
         self.close = close
         self.returns = returns
         self.volume = volume
@@ -507,3 +490,21 @@ class Alpha(object):
         
     def alpha_101(self):
         return (self.close - self.open) / (self.high - self.low) + 0.001
+
+if __name__ == '__main__':
+
+    tables = pd.read_sql('show tables', conn)
+    stock_pool = list(tables.iloc[3:53, 0])
+    start_date = '2016-01-01'
+    end_date = '2017-01-01'
+    
+    open = get_panel_data(stock_pool, 'Open', start_date, end_date)
+    high = get_panel_data(stock_pool, 'High', start_date, end_date)
+    low = get_panel_data(stock_pool, 'Low', start_date, end_date)
+    close = get_panel_data(stock_pool, 'Close', start_date, end_date)
+    returns = get_panel_data(stock_pool, 'ChgRate', start_date, end_date)
+    volume = get_panel_data(stock_pool, 'Volume', start_date, end_date)
+    vwap = (open + high + low + close) / 4
+    cap = close * volume
+
+    alpha = Alpha(open, high, low, close, returns, volume, vwap)
