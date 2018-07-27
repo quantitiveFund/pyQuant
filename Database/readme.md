@@ -56,10 +56,12 @@ SQLAlchemy使用了一个所谓ORM技术：Object-Relational Mapping，简单可
 安装方法
 `pip install sqlalchemy`
 
+`pip install pymysql`
+
 初始化的方法：
 `from sqlalchemy import create_engine`
 
-`engine = create_engine('mysql+mysqlconnector://root:password@localhost:3306/test')`
+`engine = create_engine('mysql+pymysql://root:password@localhost:3306/test')`
 
 然后可以使用如：
 `engine.execute('select * from ....')`
