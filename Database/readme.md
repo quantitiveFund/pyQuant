@@ -55,13 +55,19 @@ SQLAlchemy使用了一个所谓ORM技术：Object-Relational Mapping，简单可
 
 安装方法
 `pip install sqlalchemy`
+
 初始化的方法：
 `from sqlalchemy import create_engine`
+
 `engine = create_engine('mysql+mysqlconnector://root:password@localhost:3306/test')`
+
 然后可以使用如：
 `engine.execute('select * from ....')`
+
 执行通常的SQL语句来操作数据库。
 其他一个非常大的好处，就是可以将Pandas的DataFrame直接读出，或者写入MySQL。
 注意使用方法
+
 `pd.io.sql.to_sql(DataFrame, table_in_database, engine, schema = database, if_exists = 'append'or'replace'`
+
 `target_DataFrame = pd.read_sql_query('select * from table',engine)`
