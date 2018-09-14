@@ -1,0 +1,34 @@
+1530383350863	geckodriver	INFO	geckodriver 0.20.1
+1530383350887	geckodriver	INFO	Listening on 127.0.0.1:53424
+1530383353834	mozrunner::runner	INFO	Running command: "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\Administrator\\AppData\\Local\\Temp\\rust_mozprofile.oILlLCLgCRkj"
+1530383358940	Marionette	INFO	Listening on port 53439
+1530383359295	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript error: http://img1.cache.netease.com/f2e/finance/gegu/js/ne_gegu_b.jR2HPJ8AZpUI.1.js, line 2: ReferenceError: ActiveXObject is not defined
+JavaScript error: http://img1.cache.netease.com/f2e/finance/gegu/js/ne_gegu_b.jR2HPJ8AZpUI.1.js, line 2: ReferenceError: ActiveXObject is not defined
+
+###!!! [Parent][MessageChannel] Error: (msgtype=0x15008C,name=PBrowser::Msg_UpdateNativeWindowHandle) Closed channel: cannot send/recv
+
+
+###!!! [Parent][MessageChannel] Error: (msgtype=0x15007F,name=PBrowser::Msg_Destroy) Closed channel: cannot send/recv
+
+[Child 7936, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 7936, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel] Error: (msgtype=0x150001,name=PBrowser::Msg_AsyncMessage) Closed channel: cannot send/recv
+
+JavaScript error: chrome://browser/content/tab-content.js, line 281: NS_ERROR_UNEXPECTED: Component returned failure code: 0x8000ffff (NS_ERROR_UNEXPECTED) [nsIMessageSender.sendAsyncMessage]
+
+###!!! [Child][MessageChannel] Error: (msgtype=0x150001,name=PBrowser::Msg_AsyncMessage) Closed channel: cannot send/recv
+
+JavaScript error: chrome://browser/content/content.js, line 705: NS_ERROR_UNEXPECTED: Component returned failure code: 0x8000ffff (NS_ERROR_UNEXPECTED) [nsIMessageSender.sendAsyncMessage]
+
+###!!! [Child][MessageChannel] Error: (msgtype=0x150028,name=PBrowser::Msg_EnableDisableCommands) Closed channel: cannot send/recv
+
+
+###!!! [Child][MessageChannel] Error: (msgtype=0x15002B,name=PBrowser::Msg_SetInputContext) Closed channel: cannot send/recv
+
+
+###!!! [Child][MessageChannel] Error: (msgtype=0x15002B,name=PBrowser::Msg_SetInputContext) Closed channel: cannot send/recv
+
+[Child 7968, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 7968, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
