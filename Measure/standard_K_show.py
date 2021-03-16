@@ -21,7 +21,7 @@ import time
 def loadfromMysql(code, start_date, end_date=time.strftime('%Y-%m-%d',time.localtime(time.time())), paralist = ['Date','Close']):
     #连接MySQL数据库
     while True: 
-        hostname = 'localhost'
+        hostname = '10.23.0.2'
         pw = input('Please enter the password: ')
         try:
             conn = mysql.connector.connect(host = hostname, port=3306, user='root', password = pw, database='quant')  
