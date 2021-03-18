@@ -75,4 +75,4 @@ SQLAlchemy使用了一个所谓ORM技术：Object-Relational Mapping，简单可
 
 `pd.to_sql(DataFrame, table_in_database, engine, schema = database, if_exists = 'append'or'replace'`
 
-`target_DataFrame = pd.read_sql_query('select * from table',engine)`
+`target_DataFrame = pd.read_sql('select * from table',engine)`
