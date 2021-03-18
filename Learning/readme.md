@@ -37,11 +37,11 @@ Download from ( [FTP](ftp://10.23.0.2/Tools)) ([网盘](https://pan.baidu.com/s/
 
 ## Machine Learning
 
-可以参阅库里面的几本参考书，都是精选了
+可以参阅库里面的[几本参考书](https://github.com/quantitiveFund/pyQuant/tree/master/Learning/MachineLearning/Reading)，都是精选了
 
 
 
-### 如何使用Git
+### Git
 
 1. 注册到GitHub
 
@@ -67,7 +67,7 @@ Download from ( [FTP](ftp://10.23.0.2/Tools)) ([网盘](https://pan.baidu.com/s/
 
    推荐看廖雪峰的网站 [here](https://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000)
 
-### 如何使用Markdown
+### Markdown
 
 你不可缺少的技能——Markdown编辑
 
@@ -78,6 +78,60 @@ Markdown是一种可以使用普通文本编辑器编写的标记语言，通过
 - 简书上的介绍 [here](https://www.jianshu.com/p/3e906d2ce346)
 - 知乎上的介绍 [here](https://www.zhihu.com/topic/19590742/hot)
 - 用 Markdown 写作用什么文本编辑器 [here](https://www.zhihu.com/question/19637157/answer/78063239)
+
+
+
+在学会使用Markdown以后，请考虑学习Latex
+
+Latex使用平台 [Overleaf](https://www.overleaf.com/project)
+
+
+
+### Mendeley
+
+What is Mendeley? Mendeley is a free **reference manager** and PDF reader designed for researchers, students, and academics. Whether you're writing your dissertation, organising your literature for easy retrieval, or need to read journal articles on the go, Mendeley can help.
+
+Download Mendeley：  [Windows](https://www.mendeley.com/autoupdates/installer/Windows-x86/stable-incoming), [Mac](https://www.mendeley.com/download-desktop-new/macOS)
+
+链接：
+
+- Mendeley－一款免费好用的文献管理软件 [click](https://zhuanlan.zhihu.com/p/28762628)
+- Mendeley教程-参考文献引用（论文撰写必备！） [click](https://zhuanlan.zhihu.com/p/32249499)
+
+
+
+### Notebook
+
+Evernote 印象笔记
+
+
+
+### Flowchart
+
+[Draw.io](http://draw.io)  在线，无需下载，支持Latex/Markdown语法
+
+draw.io is a free online diagramming software application for building diagramming applications. It also produces web-based diagramming technology and integrates with [Google Drive](https://drive.google.com/drive/my-drive) and Dropbox. 
+
+链接
+
+- 开源流程图工具 draw.io 的搭建 [Click](https://zhuanlan.zhihu.com/p/98635546)
+
+
+
+### Webpage
+
+建议大家可以将自己的工作放到一个主页里面，可以参考使用Google提供的[平台](https://sites.google.com/new)，以及Github提供的[平台](https://pages.github.com/)
+
+
+
+### Colab
+
+- [Colab](https://colab.research.google.com)是Google最近推出的一项Python在线编程的免费服务, 有了它,不学Python编程的理由又少了一个.
+
+- Colab环境已经集成了流行的深度学习框架Tensorflow,并附赠了一个虚拟机. 
+
+- Colab的操作类似于jupyter notebook.
+- Colab资源可以以链接方式共享给其他人, 其他人可以直接在线运行, 观看效果
 
 
 
